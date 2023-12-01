@@ -138,8 +138,10 @@ void example_ckks_basics()
     */
     Ciphertext x3_encrypted;
     print_line(__LINE__);
+    //cout << "    + Scale of x : " << log2(x1_encrypted.scale()) << " bits" << endl;
     cout << "Compute x^2 and relinearize:" << endl;
     evaluator.square(x1_encrypted, x3_encrypted);
+    //暗号文どうしの乗算の結果は１次式ではなく２次式になる
     evaluator.relinearize_inplace(x3_encrypted, relin_keys);
     cout << "    + Scale of x^2 before rescale: " << log2(x3_encrypted.scale()) << " bits" << endl;
 
@@ -154,6 +156,9 @@ void example_ckks_basics()
     evaluator.rescale_to_next_inplace(x3_encrypted);
     cout << "    + Scale of x^2 after rescale: " << log2(x3_encrypted.scale()) << " bits" << endl;
 
+    //ここから上
+
+    //{{{
     /*
     Now x3_encrypted is at a different level than x1_encrypted, which prevents us
     from multiplying them to compute x^3. We could simply switch x1_encrypted to
@@ -194,7 +199,10 @@ void example_ckks_basics()
     evaluator.multiply_plain_inplace(x1_encrypted, plain_coeff1);
     cout << "    + Scale of 0.4*x before rescale: " << log2(x1_encrypted.scale()) << " bits" << endl;
     evaluator.rescale_to_next_inplace(x1_encrypted);
+    evaluator.rescale_to_next_inplace(x1_encrypted);
     cout << "    + Scale of 0.4*x after rescale: " << log2(x1_encrypted.scale()) << " bits" << endl;
+
+    //}}}
 
     /*
     Now we would hope to compute the sum of all three terms. However, there is
@@ -261,6 +269,7 @@ void example_ckks_basics()
     */
     print_line(__LINE__);
     cout << "Normalize scales to 2^40." << endl;
+    //ここで無理やりスケールを代入している
     x3_encrypted.scale() = pow(2.0, 40);
     x1_encrypted.scale() = pow(2.0, 40);
 
